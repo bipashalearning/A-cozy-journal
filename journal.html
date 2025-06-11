@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cozy Journal - Day View</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Georgia&display=swap');
+    body {
+      margin: 0;
+      background: #fef6ed;
+      font-family: 'Georgia', serif;
+      color: #6e4e37;
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      font-weight: 700;
+      font-size: 2.8rem;
+      margin-bottom: 0.5rem;
+      color: #a56428;
+      text-align: center;
+    }
+    .date-display {
+      font-size: 1.2rem;
+      color: #bc6c25;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .nav-buttons button {
+      background: #bc6c25;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(188, 108, 37, 0.5);
+      transition: background 0.3s ease;
+      font-size: 1rem;
+      min-width: 120px;
+    }
+    .nav-buttons button:hover {
+      background: #a65c19;
+    }
+    form {
+      max-width: 650px;
+      width: 100%;
+      background: #fff4e6;
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: inset 0 0 15px rgba(188, 108, 37, 0.1);
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.3rem;
+    }
+    label {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #8a6242;
+      margin-bottom: 0.3rem;
+    }
+    select, textarea {
+      border-radius: 12px;
+      border: 1.8px solid #bc6c25;
+      font-family: 'Georgia', serif;
+      font-size: 1rem;
+      padding: 0.7rem 1rem;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+    }
+    select:focus, textarea:focus {
+      border-color: #a65c19;
+      outline: none;
+      box-shadow: 0 0 8px #a65c19aa;
+    }
+    textarea {
+      min-height: 100px;
+    }
+    .streak {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #bc6c25;
+      text-align: center;
+      user-select: none;
+    }
+    /* To-Do List */
+    .todo-container {
+      max-width: 650px;
+      width: 100%;
+      background: #fff1e6;
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      box-shadow: inset 0 0 12px rgba(188, 108, 37, 0.1);
+      margin-bottom: 2.5rem;
+    }
+    .todo-container h2 {
+      color: #bc6c25;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    #todo-list {
+      list-style: none;
+      padding-left: 0;
+      max-height: 180px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+    #todo-list li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.7rem;
+      font-size: 1rem;
+      color: #6e4e37;
+      cursor: default;
+    }
+    #todo-list li input[type="checkbox"] {
+      margin-right: 0.8rem;
+      transform: scale(1.3);
+      cursor: pointer;
+    }
+    #todo-input {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: 1.8px solid #bc6c25;
+      font-family: 'Georgia', serif;
+      transition: border-color 0.3s ease;
+    }
+    #todo-input:focus {
+      border-color: #a65c19;
+      outline: none;
+      box-shadow: 0 0 8px #a65c19aa;
+    }
+    #add-todo {
+      background: #bc6c25;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(188, 108, 37, 0.5);
+      transition: background 0.3s ease;
+      font-size: 1rem;
+      margin-top: 0.8rem;
+    }
+    #add-todo:hover {
+      background: #a65c19;
+    }
+    /* Pomodoro Timer */
+    .pomodoro-container {
+      max-width: 650px;
+      width: 100%;
+      background: #fff1e6;
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: inset 0 0 12px rgba(188, 108, 37, 0.1);
+      text-align: center;
+    }
+    .pomodoro-container h2 {
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #bc6c25;
+    }
+    #pomodoro-timer {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #66513e;
+      margin-bottom: 1rem;
+      font-family: 'Courier New', Courier, monospace;
+      letter-spacing: 3px;
+      user-select: none;
+    }
+    .pomodoro-buttons button {
+      background: #bc6c25;
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0 0.6rem;
+      box-shadow: 0 4px 10px rgba(188, 108, 37, 0.5);
+      transition: background 0.3s ease;
+      font-size: 1rem;
+      min-width: 100px;
+    }
+    .pomodoro-buttons button:hover {
+      background: #a65c19;
+    }
+    /* Calendar */
+    .calendar-container {
+      max-width: 650px;
+      width: 100%;
+      background: #fff4e6;
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: inset 0 0 15px rgba(188, 108, 37, 0.1);
+      margin-bottom: 3rem;
+    }
+    .calendar-container h2 {
+      color: #bc6c25;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    #calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.4rem;
+      user-select: none;
+    }
+    .calendar-day {
+      padding: 0.7rem 0;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #6e4e37;
+      border: 1.5px solid transparent;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      user-select: none;
+    }
+    .calendar-day:hover {
+      background-color: #f7d9b3;
+      border-color: #bc6c25;
+    }
+    .calendar-day.today {
+      border: 2.5px solid #a65c19;
+      font-weight: 700;
+    }
+    .calendar-day.journaled {
+      background-color: #b7e4c7;
+      border-color: #6aa15e;
+      color: #2f5d30;
+    }
+    /* Accessibility */
+    button:focus, input:focus, select:focus, textarea:focus {
+      outline: 3px solid #a65c19;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cozy Journal</h1>
+
+  <div class="date-display" id="date-display" aria-live="polite" aria-atomic="true">Loading date...</div>
+
+  <div class="nav-buttons" role="navigation" aria-label="Date navigation">
+    <button id="prev-day" aria-label="Previous day">← Previous Day</button>
+    <button id="next-day" aria-label="Next day">Next Day →</button>
+  </div>
+
+  <div class="streak" id="streak">Current streak: 0 days</div>
+
+  <form id="journal-form" aria-label="Journal entry form">
+    <label for="mood">Mood:</label>
+    <select id="mood" name="mood" aria-describedby="mood-help">
+      <option value="">-- Select your mood --</option>
+      <option>Happy</option>
+      <option>Calm</option>
+      <option>Reflective</option>
+      <option>Inspired</option>
+      <option>Sad</option>
+      <option>Tired</option>
+      <option>Excited</option>
+      <option>Anxious</option>
+      <option>Grateful</option>
+    </select>
+    <small id="mood-help">Choose your current mood</small>
+
+    <label for="gratitude">Gratitude (what are you thankful for?):</label>
+    <textarea id="gratitude" name="gratitude" placeholder="Write your gratitude here..."></textarea>
+
+    <label for="reflection">Reflection / Thoughts:</label>
+    <textarea id="reflection" name="reflection" placeholder="Write your thoughts here..."></textarea>
+
+    <button type="submit" style="
+      background:#bc6c25; color:white; border:none; padding:0.8rem 1.5rem; 
+      border-radius:12px; font-weight:600; cursor:pointer; box-shadow: 0 4px 10px rgba(188,108,37,0.5);
+      transition: background 0.3s ease;">Save Entry</button>
+  </form>
+
+  <section class="todo-container" aria-label="To-Do List">
+    <h2>To-Do List</h2>
+    <ul id="todo-list" role="list" aria-live="polite" aria-atomic="true"></ul>
+    <input type="text" id="todo-input" placeholder="Add a new task..." aria-label="Add new to-do task" />
+    <button id="add-todo">Add Task</button>
+  </section>
+
+  <section class="pomodoro-container" aria-label="Pomodoro Timer">
+    <h2>Pomodoro Timer</h2>
+    <div id="pomodoro-timer" aria-live="polite" aria-atomic="true">25:00</div>
+    <div class="pomodoro-buttons">
+      <button id="start-pomodoro" aria-label="Start Pomodoro timer">Start</button>
+      <button id="pause-pomodoro" aria-label="Pause Pomodoro timer">Pause</button>
+      <button id="reset-pomodoro" aria-label="Reset Pomodoro timer">Reset</button>
+    </div>
+  </section>
+
+  <section class="calendar-container" aria-label="Journal Calendar">
+    <h2>Calendar (Click day to open journal)</h2>
+    <div id="calendar" role="grid" aria-label="Days of the current month"></div>
+  </section>
+
+<script>
+  // Utilities
+  const MS_DAY = 1000 * 60 * 60 * 24;
+
+  // Initial date (start at today)
+  let currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  // DOM Elements
+  const dateDisplay = document.getElementById('date-display');
+  const prevBtn = document.getElementById('prev-day');
+  const nextBtn = document.getElementById('next-day');
+  const moodInput = document.getElementById('mood');
+  const gratitudeInput = document.getElementById('gratitude');
+  const reflectionInput = document.getElementById('reflection');
+  const journalForm = document.getElementById('journal-form');
+  const streakDisplay = document.getElementById('streak');
+  const todoListEl = document.getElementById('todo-list');
+  const todoInput = document.getElementById('todo-input');
+  const addTodoBtn = document.getElementById('add-todo');
+  const pomodoroTimerEl = document.getElementById('pomodoro-timer');
+  const startPomodoroBtn = document.getElementById('start-pomodoro');
+  const pausePomodoroBtn = document.getElementById('pause-pomodoro');
+  const resetPomodoroBtn = document.getElementById('reset-pomodoro');
+  const calendarEl = document.getElementById('calendar');
+
+  // Pomodoro variables
+  let pomodoroDuration = 25 * 60; // 25 minutes in seconds
+  let pomodoroRemaining = pomodoroDuration;
+  let pomodoroInterval = null;
+  let pomodoroRunning = false;
+
+  // Format Date as YYYY-MM-DD string
+  function formatDate(date) {
+    const y = date.getFullYear();
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const d = date.getDate().toString().padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  // Parse date string YYYY-MM-DD to Date object
+  function parseDate(str) {
+    const [y, m, d] = str.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  // Save current journal data in localStorage keyed by date string
+  function saveJournalEntry(dateStr, data) {
+    localStorage.setItem(`journal-${dateStr}`, JSON.stringify(data));
+  }
+
+  // Load journal data from localStorage by date string
+  function loadJournalEntry(dateStr) {
+    const data = localStorage.getItem(`journal-${dateStr}`);
+    return data ? JSON.parse(data) : null;
+  }
+
+  // Save to-dos keyed by date string
+  function saveTodos(dateStr, todos) {
+    localStorage.setItem(`todos-${dateStr}`, JSON.stringify(todos));
+  }
+
+  // Load to-dos
+  function loadTodos(dateStr) {
+    const data = localStorage.getItem(`todos-${dateStr}`);
+    return data ? JSON.parse(data) : [];
+  }
+
+  // Save pomodoro remaining time and running state keyed by date
+  function savePomodoro(dateStr, remaining, running) {
+    localStorage.setItem(`pomodoro-${dateStr}`, JSON.stringify({remaining, running}));
+  }
+
+  // Load pomodoro info
+  function loadPomodoro(dateStr) {
+    const data = localStorage.getItem(`pomodoro-${dateStr}`);
+    return data ? JSON.parse(data) : {remaining: pomodoroDuration, running: false};
+  }
+
+  // Get all saved journal dates
+  function getAllJournalDates() {
+    const keys = Object.keys(localStorage);
+    return keys
+      .filter(k => k.startsWith('journal-'))
+      .map(k => k.slice(8));
+  }
+
+  // Calculate streak: consecutive days with journal entries up to currentDate
+  function calculateStreak() {
+    const allDates = getAllJournalDates().sort().reverse();
+    let streak = 0;
+    let checkDate = new Date(currentDate);
+    for (;;) {
+      let dayStr = formatDate(checkDate);
+      if (allDates.includes(dayStr)) {
+        streak++;
+        checkDate = new Date(checkDate.getTime() - MS_DAY);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  // Render date display
+  function renderDate() {
+    const options = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+    dateDisplay.textContent = currentDate.toLocaleDateString(undefined, options);
+  }
+
+  // Render streak
+  function renderStreak() {
+    const streak = calculateStreak();
+    streakDisplay.textContent = `Current streak: ${streak} day${streak !== 1 ? 's' : ''}`;
+  }
+
+  // Render form fields from data object
+  function renderJournal(data) {
+    if (!data) {
+      moodInput.value = '';
+      gratitudeInput.value = '';
+      reflectionInput.value = '';
+    } else {
+      moodInput.value = data.mood || '';
+      gratitudeInput.value = data.gratitude || '';
+      reflectionInput.value = data.reflection || '';
+    }
+  }
+
+  // Render to-dos from array
+  function renderTodos(todos) {
+    todoListEl.innerHTML = '';
+    todos.forEach((todo, i) => {
+      const li = document.createElement('li');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = todo.done;
+      checkbox.setAttribute('aria-label', `Mark task ${todo.text} as done`);
+      checkbox.addEventListener('change', () => {
+        todos[i].done = checkbox.checked;
+        saveTodos(formatDate(currentDate), todos);
+        renderTodos(todos);
+      });
+      const textSpan = document.createElement('span');
+      textSpan.textContent = todo.text;
+      if (todo.done) {
+        textSpan.style.textDecoration = 'line-through';
+        textSpan.style.opacity = '0.6';
+      }
+      li.appendChild(checkbox);
+      li.appendChild(textSpan);
+
+      // Add delete button
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '✕';
+      delBtn.style.marginLeft = 'auto';
+      delBtn.style.background = 'none';
+      delBtn.style.border = 'none';
+      delBtn.style.color = '#bc6c25';
+      delBtn.style.fontWeight = '700';
+      delBtn.style.cursor = 'pointer';
+      delBtn.setAttribute('aria-label', `Delete task ${todo.text}`);
+      delBtn.addEventListener('click', () => {
+        todos.splice(i, 1);
+        saveTodos(formatDate(currentDate), todos);
+        renderTodos(todos);
+      });
+      li.appendChild(delBtn);
+
+      todoListEl.appendChild(li);
+    });
+  }
+
+  // Pomodoro timer functions
+  function updatePomodoroDisplay() {
+    const minutes = Math.floor(pomodoroRemaining / 60);
+    const seconds = pomodoroRemaining % 60;
+    pomodoroTimerEl.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+  }
+
+  function startPomodoro() {
+    if (pomodoroRunning) return;
+    pomodoroRunning = true;
+    pomodoroInterval = setInterval(() => {
+      if (pomodoroRemaining <= 0) {
+        clearInterval(pomodoroInterval);
+        pomodoroRunning = false;
+        alert('Pomodoro complete! Take a break.');
+        return;
+      }
+      pomodoroRemaining--;
+      updatePomodoroDisplay();
+      savePomodoro(formatDate(currentDate), pomodoroRemaining, pomodoroRunning);
+    }, 1000);
+    savePomodoro(formatDate(currentDate), pomodoroRemaining, pomodoroRunning);
+  }
+
+  function pausePomodoro() {
+    if (!pomodoroRunning) return;
+    clearInterval(pomodoroInterval);
+    pomodoroRunning = false;
+    savePomodoro(formatDate(currentDate), pomodoroRemaining, pomodoroRunning);
+  }
+
+  function resetPomodoro() {
+    clearInterval(pomodoroInterval);
+    pomodoroRemaining = pomodoroDuration;
+    pomodoroRunning = false;
+    updatePomodoroDisplay();
+    savePomodoro(formatDate(currentDate), pomodoroRemaining, pomodoroRunning);
+  }
+
+  // Calendar render for current month of currentDate
+  function renderCalendar() {
+    calendarEl.innerHTML = '';
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    // First day of month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const numDays = lastDay.getDate();
+
+    // Day of week (0 Sun - 6 Sat) of first day
+    const firstWeekday = firstDay.getDay();
+
+    // Fill empty slots before first day
+    for(let i=0; i < firstWeekday; i++) {
+      const emptyDiv = document.createElement('div');
+      calendarEl.appendChild(emptyDiv);
+    }
+
+    const allJournalDates = getAllJournalDates();
+
+    for(let d = 1; d <= numDays; d++) {
+      const dayDate = new Date(year, month, d);
+      const dayStr = formatDate(dayDate);
+
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'calendar-day';
+      dayDiv.textContent = d;
+      dayDiv.tabIndex = 0;
+      dayDiv.setAttribute('role', 'gridcell');
+      dayDiv.setAttribute('aria-label', `Open journal for ${dayDate.toDateString()}`);
+
+      // Mark today
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      if(dayDate.getTime() === today.getTime()) {
+        dayDiv.classList.add('today');
+      }
+
+      // Mark journaled days
+      if(allJournalDates.includes(dayStr)) {
+        dayDiv.classList.add('journaled');
+      }
+
+      dayDiv.addEventListener('click', () => {
+        currentDate = new Date(dayDate);
+        currentDate.setHours(0,0,0,0);
+        loadDay();
+      });
+      dayDiv.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          dayDiv.click();
+        }
+      });
+      calendarEl.appendChild(dayDiv);
+    }
+  }
+
+  // Load all data for currentDate
+  function loadDay() {
+    renderDate();
+    renderStreak();
+
+    const dateStr = formatDate(currentDate);
+
+    // Load journal data
+    const journalData = loadJournalEntry(dateStr);
+    renderJournal(journalData);
+
+    // Load todos
+    const todos = loadTodos(dateStr);
+    renderTodos(todos);
+
+    // Load pomodoro
+    const pomodoroData = loadPomodoro(dateStr);
+    pomodoroRemaining = pomodoroData.remaining;
+    pomodoroRunning = pomodoroData.running;
+    updatePomodoroDisplay();
+    if(pomodoroRunning) startPomodoro();
+
+    renderCalendar();
+  }
+
+  // Event listeners
+  prevBtn.addEventListener('click', () => {
+    currentDate = new Date(currentDate.getTime() - MS_DAY);
+    loadDay();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    currentDate = new Date(currentDate.getTime() + MS_DAY);
+    loadDay();
+  });
+
+  journalForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const dateStr = formatDate(currentDate);
+    const data = {
+      mood: moodInput.value,
+      gratitude: gratitudeInput.value,
+      reflection: reflectionInput.value,
+    };
+    saveJournalEntry(dateStr, data);
+    renderStreak();
+    renderCalendar();
+  });
+
+  addTodoBtn.addEventListener('click', () => {
+    const text = todoInput.value.trim();
+    if (!text) return;
+    const todos = loadTodos(formatDate(currentDate));
+    todos.push({text, done: false});
+    saveTodos(formatDate(currentDate), todos);
+    todoInput.value = '';
+    renderTodos(todos);
+  });
+
+  todoInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      addTodoBtn.click();
+    }
+  });
+
+  startPomodoroBtn.addEventListener('click', () => {
+    startPomodoro();
+  });
+
+  pausePomodoroBtn.addEventListener('click', () => {
+    pausePomodoro();
+  });
+
+  resetPomodoroBtn.addEventListener('click', () => {
+    resetPomodoro();
+  });
+
+  // Initialize
+  loadDay();
+
+</script>
+
+</body>
+</html>

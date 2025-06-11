@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bipasha's Cozy Journal - Motivation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: #fef6e4;
+      color: #4b3b2b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+    .container {
+      background: #fff4e1;
+      padding: 3rem 4rem;
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgba(171, 140, 93, 0.35);
+      max-width: 600px;
+      text-align: center;
+      user-select: none;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      font-weight: 600;
+      font-size: 2.6rem;
+      letter-spacing: 1.2px;
+    }
+    #streak-display {
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 1.8rem;
+      color: #bc6c25;
+      letter-spacing: 0.8px;
+    }
+    #date-display {
+      font-weight: 500;
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      color: #936f5b;
+    }
+    #motivation {
+      font-size: 1.45rem;
+      font-style: italic;
+      margin-bottom: 3rem;
+      line-height: 1.5;
+      color: #66513e;
+      min-height: 100px;
+      padding: 0 1rem;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    button {
+      background: #bc6c25;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(188, 108, 37, 0.5);
+      transition: background 0.3s ease;
+      font-size: 1rem;
+    }
+    button:hover {
+      background: #a65c19;
+    }
+    #go-journal {
+      margin-top: 1rem;
+      background: #936f5b;
+      box-shadow: 0 4px 10px rgba(147, 111, 91, 0.5);
+    }
+    #go-journal:hover {
+      background: #7a5949;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <h1>Welcome to Bipasha's Cozy Journal</h1>
+    <div id="streak-display">🔥 Current Streak: Day 0 out of 500</div>
+    <div id="date-display">Loading...</div>
+    <div id="motivation">Loading motivation...</div>
+    <div class="nav-buttons" role="navigation" aria-label="Change day navigation">
+      <button id="prev-day" aria-label="Previous day">← Previous Day</button>
+      <button id="next-day" aria-label="Next day">Next Day →</button>
+    </div>
+    <button id="go-journal" aria-label="Go to your journal">Open Journal 📝</button>
+  </div>
+
+  <script>
+    const startDate = new Date("2025-01-01");
+    const totalDays = 500;
+
+    // Array of motivating quotes/messages — feel free to add more
+    const motivations = [
+      "Every day is a new beginning — embrace it with hope and courage.",
+      "Small progress each day adds up to big results.",
+      "Your story is unique, make today worth writing.",
+      "Let gratitude fill your heart and light your way.",
+      "Challenges are just opportunities in disguise.",
+      "Keep growing, keep glowing.",
+      "You are stronger than you think — keep pushing forward.",
+      "Today’s efforts shape tomorrow’s success.",
+      "Stay cozy, stay inspired.",
+      "Self-care is productive — give yourself kindness."
+    ];
+
+    // Calculate current day based on startDate
+    function calculateDay() {
+      let dayOffset = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
+      if (dayOffset < 0) dayOffset = 0;
+      if (dayOffset >= totalDays) dayOffset = totalDays - 1;
+      return dayOffset;
+    }
+
+    let currentDay = calculateDay();
+
+    function getDateString(day) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + day);
+      return d.toDateString();
+    }
+
+    function updateDateDisplay() {
+      document.getElementById('date-display').textContent = getDateString(currentDay);
+    }
+
+    function updateMotivation() {
+      // Cycle motivations array using modulo
+      const msg = motivations[currentDay % motivations.length];
+      document.getElementById('motivation').textContent = `"${msg}"`;
+    }
+
+    function saveJournalDay() {
+      // Mark currentDay as journaled for streak tracking (optional on index)
+      let journaledDays = JSON.parse(localStorage.getItem('journaledDays') || '[]');
+      if (!journaledDays.includes(currentDay)) {
+        journaledDays.push(currentDay);
+        localStorage.setItem('journaledDays', JSON.stringify(journaledDays));
+      }
+    }
+
+    function updateStreak() {
+      const journaledDays = JSON.parse(localStorage.getItem('journaledDays') || '[]').sort((a,b) => a-b);
+      let streak = 0;
+      for(let i = 0; i < journaledDays.length; i++) {
+        if(journaledDays[i] === i) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+      const streakEl = document.getElementById('streak-display');
+      streakEl.textContent = `🔥 Current Streak: Day ${streak} out of ${totalDays}`;
+    }
+
+    function changeDay(delta) {
+      currentDay += delta;
+      if (currentDay < 0) currentDay = 0;
+      if (currentDay >= totalDays) currentDay = totalDays - 1;
+      updateDateDisplay();
+      updateMotivation();
+    }
+
+    // Event listeners
+    document.getElementById('prev-day').onclick = () => {
+      changeDay(-1);
+    };
+    document.getElementById('next-day').onclick = () => {
+      changeDay(1);
+    };
+    document.getElementById('go-journal').onclick = () => {
+      // Pass day in query string
+      window.location.href = `journal.html?day=${currentDay}`;
+    };
+
+    // Init page
+    updateDateDisplay();
+    updateMotivation();
+    updateStreak();
+  </script>
+</body>
+</html>
